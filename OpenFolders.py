@@ -42,10 +42,10 @@ class LeveyJennings(object):
 
 """Testing Purposes"""
 
-path = 'D:/Coding/Python/TestFiles'
-
-test = LeveyJennings()
-
-home = test.homeDirectory
-save_results = test.results_folder()
-home_to_data = test.data_folder(home, save_results)
+# path = 'D:/Coding/Python/TestFiles'
+#
+# test = LeveyJennings()
+#
+# home = test.homeDirectory
+# save_results = test.results_folder()
+# home_to_data = test.data_folder(home, save_results)
