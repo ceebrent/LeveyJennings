@@ -45,7 +45,7 @@ class LeveyJennings(object):
 
 
 """Testing Purposes"""
-# Test
+
 # path = 'D:/Coding/Python/TestFiles'
 #
 # test = LeveyJennings('ADV')
