@@ -29,13 +29,14 @@ class LeveyJennings(object):
             if e.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
                 raise  # re-raise exception if a different error occurred
 
+    # Walks through all files and directories in home folder with ending text and containing lab name
     def data_folder(self, new_directory_path):
         lab_text_files = []
         for dirpath, dirnames, files in os.walk(self.homeDirectory):
             for filename in files:
                 if filename.endswith('.txt') and self.lab_name in filename:
                     lab_text_files.append(os.path.join(dirpath, filename))
-
+        # Copies all appropriate files into result folder and takes newest version of file
         for x in range(len(lab_text_files)):
             file_name = os.path.join(new_directory_path, os.path.basename(lab_text_files[x]))
             print(file_name)
