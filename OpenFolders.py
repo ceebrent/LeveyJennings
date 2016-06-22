@@ -16,7 +16,7 @@ class LeveyJennings(object):
 
     def results_folder(self):
         move_directory_up = Path(self.homeDirectory).parents[0]
-        result_folder = 'Results/'+self.lab_name
+        result_folder = 'Results\\'+self.lab_name
         new_directory_path = os.path.join(str(move_directory_up), result_folder)
 
         os.makedirs(new_directory_path, exist_ok=True)
@@ -30,9 +30,11 @@ class LeveyJennings(object):
                 raise  # re-raise exception if a different error occurred
 
     def data_folder(self, new_directory_path):
-        lab_text_files = [os.path.join(dirpath, f)
-                        for dirpath, dirnames, files in os.walk(self.homeDirectory)
-                        for f in fnmatch.filter(files, '*.txt')]
+        lab_text_files = []
+        for dirpath, dirnames, files in os.walk(self.homeDirectory):
+            for filename in files:
+                if filename.endswith('.txt') and self.lab_name in filename:
+                    lab_text_files.append(os.path.join(dirpath, filename))
 
         for x in range(len(lab_text_files)):
             file_name = os.path.join(new_directory_path, os.path.basename(lab_text_files[x]))
@@ -43,10 +45,10 @@ class LeveyJennings(object):
 
 """Testing Purposes"""
 
-# path = 'D:/Coding/Python/TestFiles'
-#
-# test = LeveyJennings('ADV')
-#
-# home = test.homeDirectory
-# save_results = test.results_folder()
-# home_to_data = test.data_folder(home, save_results)
+path = 'D:/Coding/Python/TestFiles'
+
+test = LeveyJennings('ADV')
+
+home = test.homeDirectory
+save_results = test.results_folder()
+home_to_data = test.data_folder(save_results)
