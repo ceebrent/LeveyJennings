@@ -49,9 +49,11 @@ class DataWindow(QtGui.QDialog):
         self.show()
 
     def submit_labs(self):
-        print(self.combo_box.currentText())
+        lab_selected = self.combo_box.currentText()
+        lab_value = labs.get(lab_selected, None)
         pop_up = Loading_Dialogue(self)
-        levey = LeveyJennings()
+        levey = LeveyJennings(lab_value)
+        levey.results_folder()
         pop_up.show()
         pop_up.close()
         self.close()

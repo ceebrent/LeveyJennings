@@ -9,13 +9,14 @@ from home_directory import home_directory
 
 
 class LeveyJennings(object):
-    def __init__(self):
+    def __init__(self,lab_name):
         self.homeDirectory = home_directory
-
+        self.lab_name = lab_name
     # Creates and returns folder to store results into
+
     def results_folder(self):
         move_directory_up = Path(self.homeDirectory).parents[0]
-        result_folder = 'Results/ADL'
+        result_folder = 'Results/'+self.lab_name
         new_directory_path = os.path.join(str(move_directory_up), result_folder)
 
         os.makedirs(new_directory_path, exist_ok=True)
@@ -28,9 +29,9 @@ class LeveyJennings(object):
             if e.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
                 raise  # re-raise exception if a different error occurred
 
-    def data_folder(self, home_directory, new_directory_path):
+    def data_folder(self, new_directory_path):
         lab_text_files = [os.path.join(dirpath, f)
-                        for dirpath, dirnames, files in os.walk(home_directory)
+                        for dirpath, dirnames, files in os.walk(self.homeDirectory)
                         for f in fnmatch.filter(files, '*.txt')]
 
         for x in range(len(lab_text_files)):
@@ -44,7 +45,7 @@ class LeveyJennings(object):
 
 # path = 'D:/Coding/Python/TestFiles'
 #
-# test = LeveyJennings()
+# test = LeveyJennings('ADV')
 #
 # home = test.homeDirectory
 # save_results = test.results_folder()
