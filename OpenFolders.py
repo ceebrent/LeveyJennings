@@ -4,6 +4,8 @@ import shutil
 import errno
 from pathlib import Path
 from home_directory import home_directory
+import calendar
+import glob
 
 
 class LeveyJennings(object):
@@ -31,7 +33,7 @@ class LeveyJennings(object):
 
     def make_unique_files(self, result_path, lab_text_files):
         # Copies all appropriate files into result folder and takes newest version of file
-        new_result_path = os.path.join(result_path, 'TXT')
+        new_result_path = os.path.join(result_path, 'Temp_TXT')
         os.makedirs(new_result_path, exist_ok=True)
 
         for x in range(len(lab_text_files)):
@@ -48,7 +50,33 @@ class LeveyJennings(object):
             unique_path = os.path.join(result_path, os.path.basename(unique_file_name))
             silent_remove(unique_path)
             os.rename(file_name, unique_path)
-            silent_remove(file_name)
+
+
+def make_month_folders(result_path):
+    list_of_files = glob.glob(result_path+'\\*.txt')
+    for file in list_of_files:
+        file_name = os.path.basename(file)
+        month_digits = file_name[4:6]
+        if month_digits.startswith('0'):
+            month_digits = month_digits[1]
+        try:
+            month_name = calendar.month_name[int(month_digits)]
+        except IndexError:
+            raise SystemExit("Index Error")
+
+        year = file_name[:4]
+        month_folder_name = '{month_number} {month_name} {year}'.format(
+            month_number=month_digits, month_name=month_name, year=year
+        )
+        month_folder = os.path.join(result_path, month_folder_name)
+        os.makedirs(month_folder, exist_ok=True)
+        # Move into months folders
+        try:
+            shutil.move(file, month_folder)
+        # If file exists in month folder, delete it and add new
+        except shutil.Error:
+            os.remove(os.path.join(month_folder, os.path.basename(file)))
+            shutil.move(file, month_folder)
 
 
 # Gets date file was created from cell in original text file
@@ -82,3 +110,4 @@ home = test.homeDirectory
 save_results = test.results_folder()
 home_to_data = test.original_txt()
 unique_files = test.make_unique_files(save_results, home_to_data)
+make_month_folders(save_results)
