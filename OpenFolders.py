@@ -12,8 +12,8 @@ class LeveyJennings(object):
     def __init__(self,lab_name):
         self.homeDirectory = home_directory
         self.lab_name = lab_name
-    # Creates and returns folder to store results into
 
+    # Creates and returns folder to store results into
     def results_folder(self):
         move_directory_up = Path(self.homeDirectory).parents[0]
         result_folder = 'Results\\'+self.lab_name
@@ -29,6 +29,12 @@ class LeveyJennings(object):
             if e.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
                 raise  # re-raise exception if a different error occurred
 
+    def get_date(self, text_file):
+        with open(text_file, 'r') as original_file:
+            row = original_file.readlines()[1].split('\t')
+            file_name = os.path.basename(row[2])[:8]
+            return file_name
+
     # Walks through all files and directories in home folder with ending text and containing lab name
     def data_folder(self, new_directory_path):
         lab_text_files = []
@@ -38,18 +44,21 @@ class LeveyJennings(object):
                     lab_text_files.append(os.path.join(dirpath, filename))
         # Copies all appropriate files into result folder and takes newest version of file
         for x in range(len(lab_text_files)):
-            file_name = os.path.join(new_directory_path, os.path.basename(lab_text_files[x]))
+            date = LeveyJennings.get_date(self,lab_text_files[x])
+            
+            file_date_name = os.path.join(new_directory_path, get_date_name)
+            file_name = os.path.join(file_date_name, os.path.basename(lab_text_files[x]))
             print(file_name)
             LeveyJennings.silent_remove(self, file_name)
             shutil.copy2(lab_text_files[x], new_directory_path)
 
 
 """Testing Purposes"""
-# Test
-# path = 'D:/Coding/Python/TestFiles'
-#
-# test = LeveyJennings('ADV')
-#
-# home = test.homeDirectory
-# save_results = test.results_folder()
-# home_to_data = test.data_folder(save_results)
+
+path = 'D:/Coding/Python/TestFiles'
+
+test = LeveyJennings('B3')
+
+home = test.homeDirectory
+save_results = test.results_folder()
+home_to_data = test.data_folder(save_results)

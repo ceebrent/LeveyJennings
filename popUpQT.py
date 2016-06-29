@@ -1,4 +1,3 @@
-import sys
 from PyQt4 import QtGui, QtCore
 from labs_dict import labs
 from OpenFolders import LeveyJennings
@@ -53,7 +52,7 @@ class DataWindow(QtGui.QDialog):
         lab_value = labs.get(lab_selected, None)
         pop_up = Loading_Dialogue(self)
         levey = LeveyJennings(lab_value)
-        levey.results_folder()
+        levey.data_folder(levey.results_folder())
         pop_up.show()
         pop_up.close()
         self.close()
