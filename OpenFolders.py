@@ -9,18 +9,19 @@ import glob
 
 
 class LeveyJennings(object):
-    def __init__(self,lab_name):
+    def __init__(self, lab_name):
         self.homeDirectory = home_directory
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
-    def results_folder(self):
-        move_directory_up = Path(self.homeDirectory).parents[0]
-        result_folder = 'Results\\'+self.lab_name
-        new_directory_path = os.path.join(str(move_directory_up), result_folder)
+        def results_folder(self):
+            move_directory_up = Path(self.homeDirectory).parents[0]
+            result_folder = 'Results\\'+self.lab_name
+            lab_results = os.path.join(str(move_directory_up), result_folder)
 
-        os.makedirs(new_directory_path, exist_ok=True)
-        return new_directory_path
+            os.makedirs(lab_results, exist_ok=True)
+            return lab_results
+        self.lab_results = results_folder(self)
 
     # Walks through all files and directories in home folder with ending text and containing lab name
     def original_txt(self):
@@ -31,9 +32,9 @@ class LeveyJennings(object):
                     lab_text_files.append(os.path.join(dirpath, filename))
         return lab_text_files
 
-    def make_unique_files(self, result_path, lab_text_files):
+    def make_unique_files(self, lab_text_files):
         # Copies all appropriate files into result folder and takes newest version of file
-        new_result_path = os.path.join(result_path, 'Temp_TXT')
+        new_result_path = os.path.join(self.lab_results, 'Temp_TXT')
         os.makedirs(new_result_path, exist_ok=True)
 
         for x in range(len(lab_text_files)):
@@ -46,8 +47,9 @@ class LeveyJennings(object):
             date = get_date(lab_text_files[x])
             old_file_name = file_name_regex(os.path.basename(lab_text_files[x]))
             unique_file_name = "{date} {old_file} {lab_name}.txt".format(date=date, old_file=old_file_name,
-                                                                     lab_name=self.lab_name)
-            unique_path = os.path.join(result_path, os.path.basename(unique_file_name))
+                                                                         lab_name=self.lab_name)
+
+            unique_path = os.path.join(self.lab_results, os.path.basename(unique_file_name))
             silent_remove(unique_path)
             os.rename(file_name, unique_path)
 
@@ -107,7 +109,6 @@ path = 'D:/Coding/Python/TestFiles'
 test = LeveyJennings('B3')
 
 home = test.homeDirectory
-save_results = test.results_folder()
 home_to_data = test.original_txt()
-unique_files = test.make_unique_files(save_results, home_to_data)
-make_month_folders(save_results)
+unique_files = test.make_unique_files(home_to_data)
+make_month_folders(test.lab_results)
