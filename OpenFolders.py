@@ -16,7 +16,7 @@ class LeveyJennings(object):
     # Creates and returns folder to store results into
         def results_folder(self):
             move_directory_up = Path(self.homeDirectory).parents[0]
-            result_folder = 'Results\\'+self.lab_name
+            result_folder = os.path.join('Results', self.lab_name)
             lab_results = os.path.join(str(move_directory_up), result_folder)
 
             os.makedirs(lab_results, exist_ok=True)
@@ -67,8 +67,8 @@ def make_month_folders(result_path):
             raise SystemExit("Index Error")
 
         year = file_name[:4]
-        month_folder_name = '{month_number} {month_name} {year}'.format(
-            month_number=month_digits, month_name=month_name, year=year
+        month_folder_name = '{month_name} {year}'.format(
+            month_name=month_name, year=year
         )
         month_folder = os.path.join(result_path, month_folder_name)
         os.makedirs(month_folder, exist_ok=True)
@@ -102,13 +102,14 @@ def silent_remove(filename):
         if e.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
             raise  # re-raise exception if a different error occurred
 
-"""Testing Purposes"""
-
-path = 'D:/Coding/Python/TestFiles'
-
-test = LeveyJennings('B3')
-
-home = test.homeDirectory
-home_to_data = test.original_txt()
-unique_files = test.make_unique_files(home_to_data)
-make_month_folders(test.lab_results)
+# """Testing Purposes"""
+#
+# path = 'D:/Coding/Python/TestFiles'
+#
+# test = LeveyJennings('B3')
+#
+# home = test.homeDirectory
+# home_to_data = test.original_txt()
+# unique_files = test.make_unique_files(home_to_data)
+# make_month_folders(test.lab_results)
+# print(test.lab_results)
