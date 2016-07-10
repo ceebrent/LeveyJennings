@@ -1,6 +1,6 @@
 from PyQt4 import QtGui, QtCore
 from labs_dict import labs
-from OpenFolders import LeveyJennings
+from data_main import generate_data
 
 class MyWindow(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -41,19 +41,17 @@ class DataWindow(QtGui.QDialog):
 
         layout.addStretch(1)
         self.submit_btn = QtGui.QPushButton('Submit')
-        self.submit_btn.resize(50,50)
+        self.submit_btn.resize(50, 50)
         layout.addWidget(self.submit_btn)
         self.setLayout(layout)
         self.submit_btn.clicked.connect(self.submit_labs)
-        self.show()
 
     def submit_labs(self):
         lab_selected = self.combo_box.currentText()
         lab_value = labs.get(lab_selected, None)
-        pop_up = Loading_Dialogue(self)
-        levey = LeveyJennings(lab_value)
-        levey.data_folder(levey.results_folder())
+        pop_up = Loading_Dialogue()
         pop_up.show()
+        generate_data(lab_value)
         pop_up.close()
         self.close()
 
@@ -61,17 +59,17 @@ class DataWindow(QtGui.QDialog):
 class Loading_Dialogue(QtGui.QDialog):
     def __init__(self, parent=None):
         super(Loading_Dialogue, self).__init__(parent)
-        self.setGeometry(80, 80, 200, 50)
-        self.setWindowTitle('Status')
+        self.setGeometry(100, 100, 200, 0)
+        self.setWindowTitle('Loading...')
         self.setWindowIcon(QtGui.QIcon('D:\Images\Logos\CLMS Logo_cropped.png'))
-        self.text = QtGui.QLabel("Data is processing...", self)
         layout = QtGui.QHBoxLayout()
-        layout.addWidget(self.text)
+        self.status = QtGui.QPushButton('Data is processing...')
+        layout.addWidget(self.status)
         self.setLayout(layout)
-        self.show()
 
-if __name__ == '__main__':
-    app = QtGui.QApplication([])
-    window = MyWindow()
-    window.show()
-    app.exec_()
+
+# if __name__ == '__main__':
+#     app = QtGui.QApplication([])
+#     window = MyWindow()
+#     window.show()
+#     app.exec_()

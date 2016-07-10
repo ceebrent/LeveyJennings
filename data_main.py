@@ -4,8 +4,11 @@ import shutil
 import errno
 from pathlib import Path
 from home_directory import home_directory
-import calendar
 import glob
+import pandas as pd
+import datetime
+import calendar
+import csv
 
 
 class LeveyJennings(object):
@@ -24,28 +27,29 @@ class LeveyJennings(object):
         self.lab_results = results_folder(self)
 
     # Walks through all files and directories in home folder with ending text and containing lab name
-    def original_txt(self):
-        lab_text_files = []
-        for dirpath, dirnames, files in os.walk(self.homeDirectory):
-            for filename in files:
-                if filename.endswith('.txt') and self.lab_name in filename:
-                    lab_text_files.append(os.path.join(dirpath, filename))
-        return lab_text_files
+        def original_txt(self):
+            lab_text_files = []
+            for dirpath, dirnames, files in os.walk(self.homeDirectory):
+                for filename in files:
+                    if filename.endswith('.txt') and self.lab_name in filename:
+                        lab_text_files.append(os.path.join(dirpath, filename))
+            return lab_text_files
+        self.lab_text_files = original_txt(self)
 
-    def make_unique_files(self, lab_text_files):
+    def make_unique_files(self):
         # Copies all appropriate files into result folder and takes newest version of file
         new_result_path = os.path.join(self.lab_results, 'Temp_TXT')
         os.makedirs(new_result_path, exist_ok=True)
 
-        for x in range(len(lab_text_files)):
+        for x in range(len(self.lab_text_files)):
             # Put original files into TXT folder, check for duplicates
-            file_name = os.path.join(new_result_path, os.path.basename(lab_text_files[x]))
+            file_name = os.path.join(new_result_path, os.path.basename(self.lab_text_files[x]))
             silent_remove(file_name)
-            shutil.copy2(lab_text_files[x], new_result_path)
+            shutil.copy2(self.lab_text_files[x], new_result_path)
 
             # Create new name in "Date Method Batch Lab format
-            date = get_date(lab_text_files[x])
-            old_file_name = file_name_regex(os.path.basename(lab_text_files[x]))
+            date = get_date(self.lab_text_files[x])
+            old_file_name = file_name_regex(os.path.basename(self.lab_text_files[x]))
             unique_file_name = "{date} {old_file} {lab_name}.txt".format(date=date, old_file=old_file_name,
                                                                          lab_name=self.lab_name)
 
@@ -102,14 +106,50 @@ def silent_remove(filename):
         if e.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
             raise  # re-raise exception if a different error occurred
 
-# """Testing Purposes"""
-#
-# path = 'D:/Coding/Python/TestFiles'
-#
-# test = LeveyJennings('B3')
-#
-# home = test.homeDirectory
-# home_to_data = test.original_txt()
-# unique_files = test.make_unique_files(home_to_data)
-# make_month_folders(test.lab_results)
-# print(test.lab_results)
+
+def merge_txt_to_csv(path_to_directory):
+    """ Takes list of files from directory, makes file new each time and sets designated header values"""
+    list_of_files = glob.glob(os.path.join(path_to_directory, '*.txt'))
+    out_csv_file = os.path.join(path_to_directory, 'data.csv')
+    silent_remove(out_csv_file)
+    out_csv = csv.writer(open(out_csv_file, 'a', newline=''))
+    headers_in_file = list(csv.reader(open(list_of_files[0], 'rt'), delimiter='\t'))
+    # print(headers_in_file)
+    # original_filename = headers_in_file[0][headers_in_file[0].index('Original Filename')]
+    sample_name = headers_in_file[0][headers_in_file[0].index('Sample Name')]
+    component_name = headers_in_file[0][headers_in_file[0].index('Component Name')]
+    concentration = headers_in_file[0][headers_in_file[0].index('Calculated Concentration')]
+    headers = [component_name, sample_name, concentration, 'Date']
+    out_csv.writerow(headers)
+    # out_csv_opened = csv.writer(open(out_csv_file, 'a', newline=''))
+    for files in list_of_files:
+        in_file = list(csv.reader(open(files, 'rt'), delimiter='\t'))
+        for rows in in_file:
+            if rows[in_file[0].index('Sample Name')] in ('Low QC', 'HIgh QC') and '1' in \
+                    rows[in_file[0].index('Component Name')]:
+                component_name = rows[in_file[0].index('Component Name')]
+                sample_name = rows[in_file[0].index('Sample Name')]
+                concentration = rows[in_file[0].index('Calculated Concentration')]
+                date_name = (os.path.basename(rows[in_file[0].index('Original Filename')])[:8])
+                date_formatted = str(pd.to_datetime(date_name, format='%Y%m%d').date())
+                date_final = datetime.datetime.strptime(date_formatted, '%Y-%m-%d').strftime('%m-%d-%y')
+                values = [component_name, sample_name, concentration, date_final]
+                out_csv.writerow(values)
+
+
+def walk_months(results_directory):
+    directories = next(os.walk(results_directory))[1]
+
+    for subdirectories in directories:
+        month_directory = os.path.join(results_directory, subdirectories)
+        if os.listdir(month_directory) != []:
+            merge_txt_to_csv(month_directory)
+
+
+def generate_data(lab_value):
+    lab = LeveyJennings(lab_value)
+    lab.make_unique_files()
+    make_month_folders(lab.lab_results)
+    walk_months(lab.lab_results)
+
+

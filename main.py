@@ -1,5 +1,5 @@
 from popUpQT import MyWindow
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 
 if __name__ == '__main__':
