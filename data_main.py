@@ -96,7 +96,7 @@ def get_date(text_file):
 # Gets Unique portion of original file name to append to date file
 def file_name_regex(base_name):
     base_name = base_name.strip()
-    return re.findall('^[A-Z]+\s[A-Z]+-[0-9]+', base_name)[0]
+    return re.findall('^[A-Z]+\s*[A-Z]+-[0-9]+', base_name)[0]
 
 
 def silent_remove(filename):
@@ -125,8 +125,8 @@ def merge_txt_to_csv(path_to_directory):
     for files in list_of_files:
         in_file = list(csv.reader(open(files, 'rt'), delimiter='\t'))
         for rows in in_file:
-            if rows[in_file[0].index('Sample Name')] in ('Low QC', 'HIgh QC') and '1' in \
-                    rows[in_file[0].index('Component Name')]:
+            if rows[in_file[0].index('Sample Name')] in ('Low QC', 'HIgh QC') and \
+                    rows[in_file[0].index('Component Name')].endswith('1'):
                 component_name = rows[in_file[0].index('Component Name')]
                 sample_name = rows[in_file[0].index('Sample Name')]
                 concentration = rows[in_file[0].index('Calculated Concentration')]

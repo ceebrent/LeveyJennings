@@ -50,7 +50,6 @@ class DataWindow(QtGui.QDialog):
         lab_selected = self.combo_box.currentText()
         lab_value = labs.get(lab_selected, None)
         pop_up = Loading_Dialogue()
-        pop_up.show()
         generate_data(lab_value)
         pop_up.close()
         self.close()
@@ -66,6 +65,7 @@ class Loading_Dialogue(QtGui.QDialog):
         self.status = QtGui.QPushButton('Data is processing...')
         layout.addWidget(self.status)
         self.setLayout(layout)
+        self.show()
 
 
 # if __name__ == '__main__':
