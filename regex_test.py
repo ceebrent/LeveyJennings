@@ -1,9 +1,5 @@
-import re
+from pathlib import Path
 
-def file_name_regex(base_name):
-    base_name = base_name.strip()
-    return re.findall('^[A-Z]+\s*[A-Z]+-[0-9]+', base_name)[0]
+folder = r'D:\Coding\Python\TestFiles\Results\B3\June 2016\NA_values.csv'
 
-base_name = r'T BH-619 B3 PA & PE'
-
-print(file_name_regex(base_name))
+print(Path(folder).parents[0])
