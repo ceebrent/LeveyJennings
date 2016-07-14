@@ -49,8 +49,10 @@ def make_graph(data_csv):
     """Format date name from first entry to add to graph title"""
     month_digits = df['Date'][0]
     year = '20' + month_digits[-2:]
-    if month_digits.startswith('0'):
-        month_digits = month_digits[1]
+    if month_digits.startswith('1'):
+        month_digits = month_digits[:2]
+    else:
+        month_digits = month_digits[0]
     try:
         month_name = calendar.month_name[int(month_digits)]
     except IndexError:
@@ -60,11 +62,10 @@ def make_graph(data_csv):
     )
 
     outside_sd = os.path.join(graph_folder, 'outside_2_sd.csv')
-    # silent_remove(outside_sd)
+
     grouped = df.groupby(['Component Name', 'Sample Name'])
 
-    # list_of_drugs = sorted(list(set(df['Component Name'])))
-    # print(grouped.get_group((list_of_drugs[0],)))
+
     for i in grouped.size().index:
         drug_name = i[0]
         QC = i[1]
@@ -100,12 +101,10 @@ def make_graph(data_csv):
         y_3_neg_sd_values = np.empty(x_range_full_line)
         y_3_neg_sd_values.fill(y_mean - y_sd * 3)
 
-        # for value in drug_group:
-        #     for each in y:
-        #         if each < (y_mean - (y_sd * 2)):
-        #             print(value)
-        #             with open(outside_sd, 'a') as f:
-        #                 drug_group.to_csv(f, header=False)
+
+        with open(outside_sd, 'a')as f:
+            drug_group[y < (y_mean - y_sd * 2)].to_csv(f, header=False)
+
 
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
@@ -134,7 +133,6 @@ def make_graph(data_csv):
     combinePDFs(graph_folder)
     delete_all_graphs(graph_folder)
 
-
 def combinePDFs(path_to_graphs):
     path_to_graphs.encode('unicode_escape')
     try:
@@ -154,4 +152,4 @@ def delete_all_graphs(path_to_graphs):
             os.remove(files)
 
 
-make_graph(r'D:\Coding\Python\TestFiles\Results\ADV\June 2016\data.csv')
+make_graph(r'\\192.168.0.242\profiles$\massspec\Desktop\Levey_jennings_data\Results\ADL\March 2016\data.csv')
