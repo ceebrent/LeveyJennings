@@ -20,7 +20,7 @@ def flip(items, ncol):
     and add the Lab name to top of graph as well"""
 
 
-def make_graph(data_csv):
+def make_graph(lab_name, data_csv):
     data = pd.read_csv(data_csv, encoding='utf-8-sig', low_memory=False)
     df = pd.DataFrame(data)
     # pd.set_option('display.float_format', lambda x: '%.2f' % x)
@@ -109,29 +109,37 @@ def make_graph(data_csv):
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
         plt.xticks(x_values, x, rotation='vertical')
-        plt.title('{month_name} {QC} {drug_name}'.format(month_name=month_folder_name,
+        plt.title('{lab_name} {month_name} {QC} {drug_name}'.format(lab_name=lab_name, month_name=month_folder_name,
                                                          QC=QC, drug_name=drug_name[:-2]))
 
         """Begin to plot mean and sd values"""
         plt.plot(x_values_full_line, y_mean_values, 'gold', label='Mean')
+        plt.text(x_values_full_line[-1], y_mean_values[-1], 'Mean')
         plt.plot(x_values_full_line, y_1_pos_sd_values, 'lime', label='1 SD')
+        plt.text(x_values_full_line[-1], y_1_pos_sd_values[-1], '+1 SD')
         plt.plot(x_values_full_line, y_2_pos_sd_values, color='darkviolet', label='2 SD')
+        plt.text(x_values_full_line[-1], y_2_pos_sd_values[-1], '+2 SD')
         plt.plot(x_values_full_line, y_3_pos_sd_values, 'darkred', label='3 SD')
+        plt.text(x_values_full_line[-1], y_3_pos_sd_values[-1], '+3 SD')
         plt.plot(x_values_full_line, y_1_neg_sd_values, 'lime')
+        plt.text(x_values_full_line[-1], y_1_neg_sd_values[-1], '-1 SD')
         plt.plot(x_values_full_line, y_2_neg_sd_values, color='darkviolet')
+        plt.text(x_values_full_line[-1], y_2_neg_sd_values[-1], '-2 SD')
         plt.plot(x_values_full_line, y_3_neg_sd_values, 'darkred')
+        plt.text(x_values_full_line[-1], y_3_neg_sd_values[-1], '-3 SD')
 
         if QC == 'Low QC':
             plt.plot(x_values, y, color='blue', marker='o')
         else:
             plt.plot(x_values, y, color='red', marker='o')
         plt.legend(ncol=6, fontsize=9,loc='upper center')
-        graph_name = '{drug_name} {QC}.pdf'.format(drug_name=drug_name, QC=QC)
+        graph_name = '{lab_name} {drug_name} {QC}.pdf'.format(lab_name=lab_name, drug_name=drug_name, QC=QC)
         graph_name = graph_name.replace('/', '-')
         plt.savefig(os.path.join(graph_folder, graph_name))
         plt.close()
-    combinePDFs(graph_folder)
-    delete_all_graphs(graph_folder)
+        sys.exit(0)
+##    combinePDFs(graph_folder)
+##    delete_all_graphs(graph_folder)
 
 def combinePDFs(path_to_graphs):
     path_to_graphs.encode('unicode_escape')
@@ -152,4 +160,4 @@ def delete_all_graphs(path_to_graphs):
             os.remove(files)
 
 
-make_graph(r'\\192.168.0.242\profiles$\massspec\Desktop\Levey_jennings_data\Results\ADL\March 2016\data.csv')
+make_graph('ADL', r'\\192.168.0.242\profiles$\massspec\Desktop\Levey_jennings_data\Results\ADL\March 2016\data.csv')
