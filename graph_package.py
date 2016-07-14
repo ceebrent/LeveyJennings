@@ -29,24 +29,23 @@ def make_graph(data_csv):
 
     df.sort_values(['Component Name', 'Sample Name'], inplace=True)
     df.drop_duplicates(['Component Name', 'Sample Name', 'Date'], inplace=True)
-    some_values = ['< 0']
-    df['Calculated Concentration'].fillna('< 0', inplace=True)
-    list_of_na = df.loc[df['Calculated Concentration'].isin(some_values)]
-    if list_of_na.empty:
-        df['Calculated Concentration'] = df['Calculated Concentration'].astype(float)
-    else:
-        path_to_na = Path(data_csv).parents[0]
-        na_out_csv = os.path.join(str(path_to_na), 'NA_values.csv')
-        list_of_na.to_csv(na_out_csv)
-        print('NA')
-        sys.exit(0)
-
     graph_folder = os.path.join(os.path.dirname(data_csv), 'Graphs')
     try:
         shutil.rmtree(graph_folder)
     except FileNotFoundError:
         pass
     os.makedirs(graph_folder)
+
+    some_values = ['< 0']
+    df['Calculated Concentration'].fillna('< 0', inplace=True)
+    list_of_na = df.loc[df['Calculated Concentration'].isin(some_values)]
+    if list_of_na.empty:
+        df['Calculated Concentration'] = df['Calculated Concentration'].astype(float)
+    else:
+        na_out_csv = os.path.join(graph_folder, 'NA_values.csv')
+        list_of_na.to_csv(na_out_csv)
+        print('NA')
+        sys.exit(0)
     """Format date name from first entry to add to graph title"""
     month_digits = df['Date'][0]
     year = '20' + month_digits[-2:]
@@ -59,6 +58,9 @@ def make_graph(data_csv):
     month_folder_name = '{month_name} {year}'.format(
         month_name=month_name, year=year
     )
+
+    outside_sd = os.path.join(graph_folder, 'outside_2_sd.csv')
+    # silent_remove(outside_sd)
     grouped = df.groupby(['Component Name', 'Sample Name'])
 
     # list_of_drugs = sorted(list(set(df['Component Name'])))
@@ -97,6 +99,13 @@ def make_graph(data_csv):
 
         y_3_neg_sd_values = np.empty(x_range_full_line)
         y_3_neg_sd_values.fill(y_mean - y_sd * 3)
+
+        # for value in drug_group:
+        #     for each in y:
+        #         if each < (y_mean - (y_sd * 2)):
+        #             print(value)
+        #             with open(outside_sd, 'a') as f:
+        #                 drug_group.to_csv(f, header=False)
 
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
