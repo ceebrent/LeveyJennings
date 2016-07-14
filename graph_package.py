@@ -10,6 +10,7 @@ from data_main import silent_remove
 from PyPDF2 import PdfFileReader, PdfFileMerger
 import shutil
 import glob
+from matplotlib.backends.backend_pdf import PdfPages
 plt.style.use('ggplot')
 
 
@@ -62,7 +63,7 @@ def make_graph(lab_name, data_csv):
     )
 
     outside_sd = os.path.join(graph_folder, 'outside_2_sd.csv')
-
+    pdf_to_save = PdfPages(os.path.join(graph_folder, 'Levey-Jennings Graphs.pdf'))
     grouped = df.groupby(['Component Name', 'Sample Name'])
 
 
@@ -105,13 +106,15 @@ def make_graph(lab_name, data_csv):
         with open(outside_sd, 'a')as f:
             drug_group[y < (y_mean - y_sd * 2)].to_csv(f, header=False)
 
-
+        plt.figure(figsize=(10,4))
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
-        plt.xticks(x_values, x, rotation='vertical')
+        plt.xticks(x_values, x, rotation=70)
+        plt.tick_params(axis='x',labelsize=5)
         plt.title('{lab_name} {month_name} {QC} {drug_name}'.format(lab_name=lab_name, month_name=month_folder_name,
                                                          QC=QC, drug_name=drug_name[:-2]))
-
+        plt.ylabel('Concentration (ng/mL)', fontsize=10)
+        
         """Begin to plot mean and sd values"""
         plt.plot(x_values_full_line, y_mean_values, 'gold', label='Mean')
         plt.text(x_values_full_line[-1], y_mean_values[-1], 'Mean')
@@ -133,31 +136,10 @@ def make_graph(lab_name, data_csv):
         else:
             plt.plot(x_values, y, color='red', marker='o')
         plt.legend(ncol=6, fontsize=9,loc='upper center')
-        graph_name = '{lab_name} {drug_name} {QC}.pdf'.format(lab_name=lab_name, drug_name=drug_name, QC=QC)
-        graph_name = graph_name.replace('/', '-')
-        plt.savefig(os.path.join(graph_folder, graph_name))
+        pdf_to_save.savefig()
         plt.close()
-        sys.exit(0)
-##    combinePDFs(graph_folder)
-##    delete_all_graphs(graph_folder)
+    pdf_to_save.close()   
 
-def combinePDFs(path_to_graphs):
-    path_to_graphs.encode('unicode_escape')
-    try:
-        pdf_files = [f for f in os.listdir(path_to_graphs) if f.endswith('pdf')]
-        merger = PdfFileMerger()
-        for filename in pdf_files:
-            merger.append(PdfFileReader(os.path.join(path_to_graphs, filename), 'rb'))
-        merger.write(os.path.join(path_to_graphs, 'Levey-Jennings Graphs.pdf'))
-    except OSError as exception:
-        raise exception.errno
-
-
-def delete_all_graphs(path_to_graphs):
-    list_of_files = glob.glob(os.path.join(path_to_graphs, '*.pdf'))
-    for files in list_of_files:
-        if files != os.path.join(path_to_graphs, 'Levey-Jennings Graphs.pdf'):
-            os.remove(files)
 
 
 make_graph('ADL', r'\\192.168.0.242\profiles$\massspec\Desktop\Levey_jennings_data\Results\ADL\March 2016\data.csv')
