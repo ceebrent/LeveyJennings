@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
+import sys
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -40,8 +41,7 @@ class Ui_Loading(object):
         self.label.setText(_translate("Loading", "Data is processing...Please wait", None))
 
 
-if __name__ == "__main__":
-    import sys
+def main():
     app = QtGui.QApplication(sys.argv)
     Loading = QtGui.QDialog()
     ui = Ui_Loading()
@@ -49,3 +49,5 @@ if __name__ == "__main__":
     Loading.show()
     sys.exit(app.exec_())
 
+if __name__ == "__main__":
+    main()

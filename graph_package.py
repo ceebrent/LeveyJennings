@@ -109,7 +109,7 @@ def make_graph(lab_name, data_csv):
         plt.figure(figsize=(10,4))
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
-        plt.xticks(x_values, x, rotation=70)
+        plt.xticks(x_values, x, rotation=60)
         plt.tick_params(axis='x',labelsize=5)
         plt.title('{lab_name} {month_name} {QC} {drug_name}'.format(lab_name=lab_name, month_name=month_folder_name,
                                                          QC=QC, drug_name=drug_name[:-2]))
@@ -142,4 +142,4 @@ def make_graph(lab_name, data_csv):
 
 
 
-make_graph('ADL', r'\\192.168.0.242\profiles$\massspec\Desktop\Levey_jennings_data\Results\ADL\March 2016\data.csv')
+make_graph('ADV', r'D:\Coding\Python\TestFiles\Results\ADV\June 2016\data.csv')
