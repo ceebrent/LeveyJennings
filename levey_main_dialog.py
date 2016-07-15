@@ -10,6 +10,10 @@ from PyQt4 import QtCore, QtGui
 from labs_dict import labs
 from data_main import generate_data
 import loading_dialog
+from home_directory import home_directory
+from pathlib import Path
+import os
+from graph_package import make_graph
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -70,8 +74,11 @@ class Ui_graph_tab(object):
         self.horizontalLayoutWidget_4.setObjectName(_fromUtf8("horizontalLayoutWidget_4"))
         self.horizontalLayout_4 = QtGui.QHBoxLayout(self.horizontalLayoutWidget_4)
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+
         self.submit_file_button = QtGui.QPushButton(self.horizontalLayoutWidget_4)
         self.submit_file_button.setObjectName(_fromUtf8("submit_file_button"))
+        self.submit_file_button.clicked.connect(self.create_graphs)
+
         self.horizontalLayout_4.addWidget(self.submit_file_button)
         self.verticalLayoutWidget = QtGui.QWidget(self.graph_data_tab)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(40, 19, 201, 111))
@@ -88,6 +95,8 @@ class Ui_graph_tab(object):
         self.select_file_button = QtGui.QPushButton(self.verticalLayoutWidget)
         self.select_file_button.setObjectName(_fromUtf8("select_file_button"))
         self.verticalLayout_2.addWidget(self.select_file_button)
+        self.select_file_button.clicked.connect(self.file_pop_up)
+
         self.display_file_name = QtGui.QLineEdit(self.verticalLayoutWidget)
         self.display_file_name.setObjectName(_fromUtf8("display_file_name"))
         self.verticalLayout_2.addWidget(self.display_file_name)
@@ -95,7 +104,8 @@ class Ui_graph_tab(object):
 
         self.retranslateUi(graph_tab)
         graph_tab.setCurrentIndex(1)
-        QtCore.QObject.connect(self.select_file_button, QtCore.SIGNAL(_fromUtf8("clicked()")), self.display_file_name.paste)
+        # QtCore.QObject.connect(self.select_file_button, QtCore.SIGNAL(_fromUtf8("clicked()")),
+        # self.display_file_name.paste)
         QtCore.QMetaObject.connectSlotsByName(graph_tab)
 
     def retranslateUi(self, graph_tab):
@@ -111,16 +121,33 @@ class Ui_graph_tab(object):
     def submit_labs(self, generate_data_tab):
         lab_selected = self.lab_combo_box.currentText()
         lab_value = labs.get(lab_selected, None)
-        self.create_loading(lab_value)
+        self.create_data(lab_value)
 
-
-    def create_loading(self, lab_value):
+    def create_data(self, lab_value):
         loading = QtGui.QDialog()
         ui_load = loading_dialog.Ui_Loading()
         ui_load.setupUi(loading)
         loading.show()
         generate_data(lab_value)
         loading.close()
+
+    def file_pop_up(self):
+        home = str(Path(home_directory).parents[0])
+        results_directory = os.path.join(home, 'Results')
+        self.display_file_name.setText(QtGui.QFileDialog.getOpenFileName(None, None, results_directory))
+
+    def create_graphs(self):
+        file_name = self.display_file_name.text()
+        month_directory = os.path.dirname(file_name)
+        lab_directory = os.path.dirname(month_directory)
+        lab_name = os.path.basename((lab_directory))
+        loading = QtGui.QDialog()
+        ui_load = loading_dialog.Ui_Loading()
+        ui_load.setupUi(loading)
+        loading.show()
+        make_graph(lab_name, file_name)
+        loading.close()
+
 
 
 if __name__ == "__main__":

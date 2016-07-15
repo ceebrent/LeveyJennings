@@ -138,8 +138,4 @@ def make_graph(lab_name, data_csv):
         plt.legend(ncol=6, fontsize=9,loc='upper center')
         pdf_to_save.savefig()
         plt.close()
-    pdf_to_save.close()   
-
-
-
-make_graph('ADV', r'D:\Coding\Python\TestFiles\Results\ADV\June 2016\data.csv')
+    pdf_to_save.close()
