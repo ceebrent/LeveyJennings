@@ -65,26 +65,27 @@ def make_month_folders(result_path):
     for file in list_of_files:
         file_name = os.path.basename(file)
         month_digits = file_name[4:6]
-        if month_digits.startswith('0'):
-            month_digits = month_digits[1]
-        try:
-            month_name = calendar.month_name[int(month_digits)]
-        except IndexError:
-            raise SystemExit("Index Error")
+        if month_digits.startswith('0') or month_digits.startswith('1'):
+            if month_digits.startswith('0'):
+                month_digits = month_digits[1]
+            try:
+                month_name = calendar.month_name[int(month_digits)]
+            except IndexError:
+                raise SystemExit("Index Error")
 
-        year = file_name[:4]
-        month_folder_name = '{month_name} {year}'.format(
-            month_name=month_name, year=year
-        )
-        month_folder = os.path.join(result_path, month_folder_name)
-        os.makedirs(month_folder, exist_ok=True)
-        # Move into months folders
-        try:
-            shutil.move(file, month_folder)
-        # If file exists in month folder, delete it and add new
-        except shutil.Error:
-            os.remove(os.path.join(month_folder, os.path.basename(file)))
-            shutil.move(file, month_folder)
+            year = file_name[:4]
+            month_folder_name = '{month_name} {year}'.format(
+                month_name=month_name, year=year
+            )
+            month_folder = os.path.join(result_path, month_folder_name)
+            os.makedirs(month_folder, exist_ok=True)
+            # Move into months folders
+            try:
+                shutil.move(file, month_folder)
+            # If file exists in month folder, delete it and add new
+            except shutil.Error:
+                os.remove(os.path.join(month_folder, os.path.basename(file)))
+                shutil.move(file, month_folder)
 
 
 # Gets date file was created from cell in original text file
