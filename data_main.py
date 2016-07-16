@@ -7,15 +7,21 @@ import os
 import re
 import shutil
 from pathlib import Path
-
+import sys
 import pandas as pd
 
-from home_directory import home_folder
+##from home_directory import home_folder
 
 
 class LeveyJennings(object):
     def __init__(self, lab_name):
-        self.homeDirectory = home_folder
+        def get_home(self):
+            if hasattr(sys, 'frozen'):
+                return sys.executable
+            else:
+                return sys.argv[0]
+        
+        self.homeDirectory = get_home(self)
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
