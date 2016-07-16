@@ -40,7 +40,7 @@ class LeveyJennings(object):
     # Walks through all files and directories in home folder with ending text and containing lab name
         def original_txt(self):
             lab_text_files = []
-            for dirpath, dirnames, files in os.walk(os.path.join(self.homeDirectory, 'Data'):
+            for dirpath, dirnames, files in os.walk(os.path.join(self.homeDirectory, 'Data')):
                 for filename in files:
                     if filename.endswith('.txt') and self.lab_name in filename:
                         lab_text_files.append(os.path.join(dirpath, filename))
