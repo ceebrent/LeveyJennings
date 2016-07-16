@@ -17,18 +17,21 @@ class LeveyJennings(object):
     def __init__(self, lab_name):
         def get_home(self):
             if hasattr(sys, 'frozen'):
-                return sys.executable
+                return str(sys.executable)
             else:
-                return sys.argv[0]
+                return str(sys.argv[0])
         
         self.homeDirectory = get_home(self)
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
         def results_folder(self):
-            move_directory_up = Path(self.homeDirectory).parents[0]
-            result_folder = os.path.join('Results', self.lab_name)
-            lab_results = os.path.join(str(move_directory_up), result_folder)
+            # move_directory_up = Path(self.homeDirectory).parents[0]
+            
+            result_folder = os.path.join(self.homeDirectory,'Results')
+            os.makedirs(result_folder, exist_ok=True)
+            
+            lab_results = os.path.join(result_folder, self.lab_name)
 
             os.makedirs(lab_results, exist_ok=True)
             return lab_results
@@ -37,7 +40,7 @@ class LeveyJennings(object):
     # Walks through all files and directories in home folder with ending text and containing lab name
         def original_txt(self):
             lab_text_files = []
-            for dirpath, dirnames, files in os.walk(self.homeDirectory):
+            for dirpath, dirnames, files in os.walk(os.path.join(self.homeDirectory, 'Data'):
                 for filename in files:
                     if filename.endswith('.txt') and self.lab_name in filename:
                         lab_text_files.append(os.path.join(dirpath, filename))
