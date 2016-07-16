@@ -42,7 +42,7 @@ def make_graph(lab_name, data_csv):
     else:
         na_out_csv = os.path.join(graph_folder, 'NA_values.csv')
         list_of_na.to_csv(na_out_csv)
-        sys.exit(0)
+        return
     """Format date name from first entry to add to graph title"""
     month_digits = df['Date'][0]
     year = '20' + month_digits[-2:]
