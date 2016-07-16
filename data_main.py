@@ -17,9 +17,9 @@ class LeveyJennings(object):
     def __init__(self, lab_name):
         def get_home(self):
             if hasattr(sys, 'frozen'):
-                return str(sys.executable)
+                return os.path.dirname(sys.executable)
             else:
-                return str(sys.argv[0])
+                return os.path.dirname(sys.argv[0])
         
         self.homeDirectory = get_home(self)
         self.lab_name = lab_name
