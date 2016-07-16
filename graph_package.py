@@ -1,16 +1,13 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import itertools
-from pathlib import Path
-import os
-import sys
 import calendar
-from data_main import silent_remove
-from PyPDF2 import PdfFileReader, PdfFileMerger
+import itertools
+import os
 import shutil
-import glob
+import sys
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
+
 plt.style.use('ggplot')
 
 
@@ -45,7 +42,6 @@ def make_graph(lab_name, data_csv):
     else:
         na_out_csv = os.path.join(graph_folder, 'NA_values.csv')
         list_of_na.to_csv(na_out_csv)
-        print('NA')
         sys.exit(0)
     """Format date name from first entry to add to graph title"""
     month_digits = df['Date'][0]
@@ -101,7 +97,6 @@ def make_graph(lab_name, data_csv):
 
         y_3_neg_sd_values = np.empty(x_range_full_line)
         y_3_neg_sd_values.fill(y_mean - y_sd * 3)
-
 
         with open(outside_sd, 'a')as f:
             drug_group[y < (y_mean - y_sd * 2)].to_csv(f, header=False)

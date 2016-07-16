@@ -6,14 +6,16 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
-from labs_dict import labs
-from data_main import generate_data
-import loading_dialog
-from home_directory import home_directory
-from pathlib import Path
 import os
+from pathlib import Path
+
+from PyQt4 import QtCore, QtGui
+
+import loading_dialog
+from data_main import generate_data
 from graph_package import make_graph
+from home_directory import home_folder
+from labs_dict import labs
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -28,6 +30,7 @@ try:
 except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
+
 
 class Ui_graph_tab(object):
     def setupUi(self, graph_tab):
@@ -132,7 +135,7 @@ class Ui_graph_tab(object):
         loading.close()
 
     def file_pop_up(self):
-        home = str(Path(home_directory).parents[0])
+        home = str(Path(home_folder).parents[0])
         results_directory = os.path.join(home, 'Results')
         self.display_file_name.setText(QtGui.QFileDialog.getOpenFileName(None, None, results_directory))
 
@@ -140,14 +143,13 @@ class Ui_graph_tab(object):
         file_name = self.display_file_name.text()
         month_directory = os.path.dirname(file_name)
         lab_directory = os.path.dirname(month_directory)
-        lab_name = os.path.basename((lab_directory))
+        lab_name = os.path.basename(lab_directory)
         loading = QtGui.QDialog()
         ui_load = loading_dialog.Ui_Loading()
         ui_load.setupUi(loading)
         loading.show()
         make_graph(lab_name, file_name)
         loading.close()
-
 
 
 if __name__ == "__main__":

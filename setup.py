@@ -1,19 +1,13 @@
-from distutils.core import setup
-import py2exe, sys, os
+import sys
+from cx_Freeze import setup, Executable
 
-sys.argv.append('py2exe')
-
-DATA=[('imageformats',['C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qjpeg4.dll',
-    'C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qgif4.dll',
-    'C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qico4.dll',
-    'C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qmng4.dll',
-    'C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qsvg4.dll',
-    'C:\\Python27/Lib/site-packages/PyQt4/plugins/imageformats/qtiff4.dll'
-    ])]
+includes = ['PyQt4.QtCore', 'sip']
+exe = Executable("main.pyw", base = 'Win32GUI')
 
 setup(
-    options={'py2exe': {'bundle_files': 1, 'compressed': True,"includes": ["sip"]}},
-    windows=[{'script': "main.py"}],
-    zipfile=None,
-    data_files=DATA,
+    name = 'Levey Program',
+    version = '0',
+    description = "Generate data and graph Levey jennings",
+    options= {'build_exe': {'includes': includes}},
+    executables = [exe]
 )

@@ -1,19 +1,21 @@
-import re
-import os
-import shutil
-import errno
-from pathlib import Path
-from home_directory import home_directory
-import glob
-import pandas as pd
-import datetime
 import calendar
 import csv
+import datetime
+import errno
+import glob
+import os
+import re
+import shutil
+from pathlib import Path
+
+import pandas as pd
+
+from home_directory import home_folder
 
 
 class LeveyJennings(object):
     def __init__(self, lab_name):
-        self.homeDirectory = home_directory
+        self.homeDirectory = home_folder
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
