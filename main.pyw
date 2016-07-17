@@ -14,8 +14,10 @@ from PyQt4 import QtCore, QtGui
 import loading_dialog
 from data_main import generate_data
 from graph_package import make_graph
+from graph_package import validate_data_csv
 from labs_dict import labs
 from data_main import get_home
+import warning_popup
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -131,7 +133,7 @@ class Ui_graph_tab(object):
         ui_load = loading_dialog.Ui_Loading()
         ui_load.setupUi(loading)
         loading.show()
-        loading.label.repaint()
+        loading.repaint()
         generate_data(lab_value)
         loading.close()
 
@@ -142,17 +144,26 @@ class Ui_graph_tab(object):
 
     def create_graphs(self):
         file_name = self.display_file_name.text()
-        month_directory = os.path.dirname(file_name)
-        lab_directory = os.path.dirname(month_directory)
-        lab_name = os.path.basename(lab_directory)
-        loading = QtGui.QDialog()
-        ui_load = loading_dialog.Ui_Loading()
-        ui_load.setupUi(loading)
-        loading.show()
-        loading.label.repaint()
-        make_graph(lab_name, file_name)
-        loading.close()
-
+        data_validity = validate_data_csv(file_name)
+        if data_validity:
+            month_directory = os.path.dirname(file_name)
+            lab_directory = os.path.dirname(month_directory)
+            lab_name = os.path.basename(lab_directory)
+            loading = QtGui.QDialog()
+            ui_load = loading_dialog.Ui_Loading()
+            ui_load.setupUi(loading)
+            loading.show()
+            loading.repaint()
+            make_graph(lab_name, file_name)
+            loading.close()
+        else:
+            warning = QtGui.QDialog()
+            ui = warning_popup.Ui_warning_dialog()
+            ui.setupUi(warning)
+            warning.show()
+            warning.exec_()
+            # warning.repaint()
+            return
 
 if __name__ == "__main__":
     import sys

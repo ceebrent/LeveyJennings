@@ -134,3 +134,8 @@ def make_graph(lab_name, data_csv):
         pdf_to_save.savefig()
         plt.close()
     pdf_to_save.close()
+
+def validate_data_csv(data_csv):
+    if data_csv.endswith('data.csv'):
+        return True
+
