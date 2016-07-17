@@ -131,6 +131,7 @@ class Ui_graph_tab(object):
         ui_load = loading_dialog.Ui_Loading()
         ui_load.setupUi(loading)
         loading.show()
+        loading.label.repaint()
         generate_data(lab_value)
         loading.close()
 
@@ -148,6 +149,7 @@ class Ui_graph_tab(object):
         ui_load = loading_dialog.Ui_Loading()
         ui_load.setupUi(loading)
         loading.show()
+        loading.label.repaint()
         make_graph(lab_name, file_name)
         loading.close()
 

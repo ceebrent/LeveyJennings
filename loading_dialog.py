@@ -33,7 +33,6 @@ class Ui_Loading(object):
         self.label.setAutoFillBackground(True)
         self.label.setLineWidth(0)
         self.label.setObjectName(_fromUtf8("label"))
-
         self.retranslateUi(Loading)
         QtCore.QMetaObject.connectSlotsByName(Loading)
 
