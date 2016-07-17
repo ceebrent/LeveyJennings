@@ -23,6 +23,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
 class Ui_Loading(object):
     def setupUi(self, Loading):
         Loading.setObjectName(_fromUtf8("Loading"))

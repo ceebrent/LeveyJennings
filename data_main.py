@@ -15,13 +15,7 @@ import pandas as pd
 
 class LeveyJennings(object):
     def __init__(self, lab_name):
-        def get_home(self):
-            if hasattr(sys, 'frozen'):
-                return os.path.dirname(sys.executable)
-            else:
-                return os.path.dirname(sys.argv[0])
-        
-        self.homeDirectory = get_home(self)
+        self.homeDirectory = get_home()
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
@@ -156,6 +150,13 @@ def walk_months(results_directory):
         month_directory = os.path.join(results_directory, subdirectories)
         if os.listdir(month_directory) != []:
             merge_txt_to_csv(month_directory)
+
+
+def get_home():
+    if hasattr(sys, 'frozen'):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(sys.argv[0])
 
 
 def generate_data(lab_value):

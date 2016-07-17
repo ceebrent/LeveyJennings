@@ -14,8 +14,8 @@ from PyQt4 import QtCore, QtGui
 import loading_dialog
 from data_main import generate_data
 from graph_package import make_graph
-from home_directory import home_folder
 from labs_dict import labs
+from data_main import get_home
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -135,7 +135,7 @@ class Ui_graph_tab(object):
         loading.close()
 
     def file_pop_up(self):
-        home = str(Path(home_folder).parents[0])
+        home = get_home()
         results_directory = os.path.join(home, 'Results')
         self.display_file_name.setText(QtGui.QFileDialog.getOpenFileName(None, None, results_directory))
 
