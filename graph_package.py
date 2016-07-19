@@ -28,10 +28,9 @@ def make_graph(lab_name, data_csv):
     df.sort_values(['Component Name', 'Sample Name'], inplace=True)
     df.drop_duplicates(['Component Name', 'Sample Name', 'Date'], inplace=True)
     graph_folder = os.path.join(os.path.dirname(data_csv), 'Graphs')
-    try:
+
+    if os.path.exists(graph_folder):
         shutil.rmtree(graph_folder)
-    except FileNotFoundError:
-        pass
     os.makedirs(graph_folder)
 
     some_values = ['< 0']
@@ -61,7 +60,6 @@ def make_graph(lab_name, data_csv):
     outside_sd = os.path.join(graph_folder, 'outside_2_sd.csv')
     pdf_to_save = PdfPages(os.path.join(graph_folder, 'Levey-Jennings Graphs.pdf'))
     grouped = df.groupby(['Component Name', 'Sample Name'])
-
 
     for i in grouped.size().index:
         drug_name = i[0]
