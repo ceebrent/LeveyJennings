@@ -31,8 +31,10 @@ def make_graph(lab_name, data_csv):
 
     if os.path.exists(graph_folder):
         shutil.rmtree(graph_folder)
-    os.makedirs(graph_folder)
-
+    try:
+        os.makedirs(graph_folder)
+    except PermissionError:
+        return
     some_values = ['< 0']
     df['Calculated Concentration'].fillna('< 0', inplace=True)
     list_of_na = df.loc[df['Calculated Concentration'].isin(some_values)]
@@ -99,11 +101,11 @@ def make_graph(lab_name, data_csv):
         with open(outside_sd, 'a')as f:
             drug_group[y < (y_mean - y_sd * 2)].to_csv(f, header=False)
 
-        plt.figure(figsize=(10,4))
+        plt.figure(figsize=(10, 6))
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
         plt.xticks(x_values, x, rotation=60)
-        plt.tick_params(axis='x',labelsize=5)
+        plt.tick_params(axis='x', labelsize=5)
         plt.title('{lab_name} {month_name} {QC} {drug_name}'.format(lab_name=lab_name, month_name=month_folder_name,
                                                          QC=QC, drug_name=drug_name[:-2]))
         plt.ylabel('Concentration (ng/mL)', fontsize=10)

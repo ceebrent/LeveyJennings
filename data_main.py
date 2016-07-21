@@ -15,7 +15,9 @@ import pandas as pd
 
 class LeveyJennings(object):
     def __init__(self, lab_name):
-        self.homeDirectory = get_home()
+
+        # self.homeDirectory = get_home()
+        self.homeDirectory = r'D:\Coding\Python\TestFiles'
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
@@ -59,8 +61,10 @@ class LeveyJennings(object):
                                                                          lab_name=self.lab_name)
 
             unique_path = os.path.join(self.lab_results, os.path.basename(unique_file_name))
-            silent_remove(unique_path)
-            os.rename(file_name, unique_path)
+            # silent_remove(unique_path)
+            if not os.path.isfile(unique_path):
+                os.rename(file_name, unique_path)
+
 
 
 def make_month_folders(result_path):
@@ -85,16 +89,15 @@ def make_month_folders(result_path):
             # Move into months folders
             try:
                 shutil.move(file, month_folder)
-            # If file exists in month folder, delete it and add new
+            # If file exists in month folder, delete it and keep old
             except shutil.Error:
-                os.remove(os.path.join(month_folder, os.path.basename(file)))
-                shutil.move(file, month_folder)
+                os.remove(os.path.basename(file))
 
 
 # Gets date file was created from cell in original text file
 def get_date(text_file):
     with open(text_file, 'r') as original_file:
-        row = original_file.readlines()[1].split('\t')
+        row = original_file.readlines()[-1].split('\t')
         file_name = os.path.basename(row[2])[:8]
         return file_name
 
@@ -102,7 +105,9 @@ def get_date(text_file):
 # Gets Unique portion of original file name to append to date file
 def file_name_regex(base_name):
     base_name = base_name.strip()
-    return re.findall('^[A-Z]+\s*[A-Z]+-[0-9]+', base_name)[0]
+    unique_name = re.findall('^[A-Z]+\s*[A-Z]+-[0-9]+', base_name)
+    if unique_name:
+        return ' '.join(unique_name[0].split())
 
 
 def silent_remove(filename):
@@ -130,13 +135,14 @@ def merge_txt_to_csv(path_to_directory):
     # out_csv_opened = csv.writer(open(out_csv_file, 'a', newline=''))
     for files in list_of_files:
         in_file = list(csv.reader(open(files, 'rt'), delimiter='\t'))
+
         for rows in in_file:
             if rows[in_file[0].index('Sample Name')] in ('Low QC', 'HIgh QC') and \
                     rows[in_file[0].index('Component Name')].endswith('1'):
                 component_name = rows[in_file[0].index('Component Name')]
                 sample_name = rows[in_file[0].index('Sample Name')]
                 concentration = rows[in_file[0].index('Calculated Concentration')]
-                date_name = (os.path.basename(rows[in_file[0].index('Original Filename')])[:8])
+                date_name = (os.path.basename(in_file[-1][in_file[0].index('Original Filename')])[:8])
                 date_formatted = str(pd.to_datetime(date_name, format='%Y%m%d').date())
                 date_final = datetime.datetime.strptime(date_formatted, '%Y-%m-%d').strftime('%m-%d-%y')
                 values = [component_name, sample_name, concentration, date_final]

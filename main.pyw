@@ -7,17 +7,15 @@
 # WARNING! All changes made in this file will be lost!
 
 import os
-from pathlib import Path
-
 from PyQt4 import QtCore, QtGui
-
-import loading_dialog
 from data_main import generate_data
+from data_main import get_home
 from graph_package import make_graph
 from graph_package import validate_data_csv
-from labs_dict import labs
-from data_main import get_home
+import loading_dialog
 import warning_popup
+from labs_dict import labs
+
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
