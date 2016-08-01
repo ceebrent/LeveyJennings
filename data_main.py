@@ -16,8 +16,7 @@ import pandas as pd
 class LeveyJennings(object):
     def __init__(self, lab_name):
 
-        # self.homeDirectory = get_home()
-        self.homeDirectory = r'D:\Coding\Python\TestFiles'
+        self.homeDirectory = get_home()
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
@@ -45,26 +44,30 @@ class LeveyJennings(object):
 
     def make_unique_files(self):
         # Copies all appropriate files into result folder and takes newest version of file
-        new_result_path = os.path.join(self.lab_results, 'Temp_TXT')
-        os.makedirs(new_result_path, exist_ok=True)
+        temp_result_path = os.path.join(self.lab_results, 'Temp_TXT')
+        os.makedirs(temp_result_path, exist_ok=True)
 
         for x in range(len(self.lab_text_files)):
             # Put original files into TXT folder, check for duplicates
-            file_name = os.path.join(new_result_path, os.path.basename(self.lab_text_files[x]))
-            silent_remove(file_name)
-            shutil.copy2(self.lab_text_files[x], new_result_path)
+            temp_file_name = os.path.join(temp_result_path, os.path.basename(self.lab_text_files[x]))
+            silent_remove(temp_file_name)
+            shutil.copy2(self.lab_text_files[x], temp_result_path)
 
-            # Create new name in "Date Method Batch Lab format
+            # Create new name in "Date Method Batch Lab" format
             date = get_date(self.lab_text_files[x])
             old_file_name = file_name_regex(os.path.basename(self.lab_text_files[x]))
-            unique_file_name = "{date} {old_file} {lab_name}.txt".format(date=date, old_file=old_file_name,
-                                                                         lab_name=self.lab_name)
+            if date and old_file_name:
+                unique_file_name = "{date} {old_file} {lab_name}.txt".format(date=date, old_file=old_file_name,
+                                                                             lab_name=self.lab_name)
 
-            unique_path = os.path.join(self.lab_results, os.path.basename(unique_file_name))
-            # silent_remove(unique_path)
-            if not os.path.isfile(unique_path):
-                os.rename(file_name, unique_path)
+                unique_path = os.path.join(self.lab_results, os.path.basename(unique_file_name))
+                # silent_remove(unique_path)
+                if os.path.isfile(unique_path):
+                    os.remove(temp_file_name)
+                else:
+                    os.rename(temp_file_name, unique_path)
 
+        shutil.rmtree(temp_result_path)
 
 
 def make_month_folders(result_path):
@@ -91,10 +94,10 @@ def make_month_folders(result_path):
                 shutil.move(file, month_folder)
             # If file exists in month folder, delete it and keep old
             except shutil.Error:
-                os.remove(os.path.basename(file))
+                os.remove(file)
 
 
-# Gets date file was created from cell in original text file
+# Gets date file that was created from cell last cell in original text file
 def get_date(text_file):
     with open(text_file, 'r') as original_file:
         row = original_file.readlines()[-1].split('\t')
