@@ -166,7 +166,7 @@ class Ui_graph_tab(object):
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    app.setWindowIcon(QtGui.QIcon('D:\Images\Logos\CLMS Logo_cropped.png'))
+    app.setWindowIcon(QtGui.QIcon('CLMS_Logo_cropped.png'))
     graph_tab = QtGui.QTabWidget()
     ui = Ui_graph_tab()
     ui.setupUi(graph_tab)

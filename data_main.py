@@ -40,7 +40,6 @@ class LeveyJennings(object):
                 for filename in files:
                     if filename.endswith('.txt') and self.lab_name in filename:
                         lab_text_files.append(os.path.join(dirpath, filename))
-            print(sorted(lab_text_files))
             return sorted(lab_text_files)
         self.lab_text_files = original_txt(self)
 
