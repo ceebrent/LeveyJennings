@@ -16,7 +16,8 @@ import pandas as pd
 class LeveyJennings(object):
     def __init__(self, lab_name):
 
-        self.homeDirectory = get_home()
+        # self.homeDirectory = get_home()
+        self.homeDirectory = r'D:\Coding\Python\TestFiles'
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
@@ -39,7 +40,8 @@ class LeveyJennings(object):
                 for filename in files:
                     if filename.endswith('.txt') and self.lab_name in filename:
                         lab_text_files.append(os.path.join(dirpath, filename))
-            return lab_text_files
+            print(sorted(lab_text_files))
+            return sorted(lab_text_files)
         self.lab_text_files = original_txt(self)
 
     def make_unique_files(self):
@@ -61,7 +63,6 @@ class LeveyJennings(object):
                                                                              lab_name=self.lab_name)
 
                 unique_path = os.path.join(self.lab_results, os.path.basename(unique_file_name))
-                # silent_remove(unique_path)
                 if os.path.isfile(unique_path):
                     os.remove(temp_file_name)
                 else:
