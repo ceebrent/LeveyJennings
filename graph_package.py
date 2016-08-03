@@ -100,6 +100,7 @@ def make_graph(lab_name, data_csv):
 
         with open(outside_sd, 'a')as f:
             drug_group[y < (y_mean - y_sd * 2)].to_csv(f, header=False)
+            drug_group[y > (y_mean + y_sd * 2)].to_csv(f, header=False)
 
         plt.figure(figsize=(10, 6))
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
