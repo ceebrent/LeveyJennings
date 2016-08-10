@@ -6,22 +6,19 @@ import glob
 import os
 import re
 import shutil
-from pathlib import Path
 import sys
 import pandas as pd
-
-##from home_directory import home_folder
 
 
 class LeveyJennings(object):
     def __init__(self, lab_name):
 
-        self.homeDirectory = get_home()
+        # self.homeDirectory = get_home()
+        self.homeDirectory = r'D:/Coding/Python/TestFiles'
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
         def results_folder(self):
-            # move_directory_up = Path(self.homeDirectory).parents[0]
             
             result_folder = os.path.join(self.homeDirectory, 'Results')
             os.makedirs(result_folder, exist_ok=True)
@@ -43,7 +40,11 @@ class LeveyJennings(object):
         self.lab_text_files = original_txt(self)
 
     def make_unique_files(self):
-        # Copies all appropriate files into result folder and takes newest version of file
+        """Creates temp folder to store txt files in until they can be renamed by date and
+        sorted according to month. This is designed to take the first txt file created if there are
+        duplicate file names ie. "PP BH-502 B3 PA" and "PP BH-502 B3 PB".
+        Note the PA is not always the first file created by the scientists while analyzing"""
+
         temp_result_path = os.path.join(self.lab_results, 'Temp_TXT')
         os.makedirs(temp_result_path, exist_ok=True)
 
@@ -57,10 +58,11 @@ class LeveyJennings(object):
             date = get_date(self.lab_text_files[x])
             old_file_name = file_name_regex(os.path.basename(self.lab_text_files[x]))
             if date and old_file_name:
-                unique_file_name = "{date} {old_file} {lab_name}.txt".format(date=date, old_file=old_file_name,
-                                                                             lab_name=self.lab_name)
+                unique_file_name = "{date} {old_file} {lab_name}.txt".format(
+                    date=date, old_file=old_file_name, lab_name=self.lab_name)
 
                 unique_path = os.path.join(self.lab_results, os.path.basename(unique_file_name))
+                # Checking for duplicate, keeping oldest file discarding new
                 if os.path.isfile(unique_path):
                     os.remove(temp_file_name)
                 else:
@@ -73,6 +75,7 @@ def make_month_folders(result_path):
     list_of_files = glob.glob(result_path+'\\*.txt')
     for file in list_of_files:
         file_name = os.path.basename(file)
+        # Slice just the portion of file name where month designation resides
         month_digits = file_name[4:6]
         if month_digits.startswith('0') or month_digits.startswith('1'):
             if month_digits.startswith('0'):
@@ -83,9 +86,7 @@ def make_month_folders(result_path):
                 raise SystemExit("Index Error")
 
             year = file_name[:4]
-            month_folder_name = '{month_name} {year}'.format(
-                month_name=month_name, year=year
-            )
+            month_folder_name = '{month_name} {year}'.format(month_name=month_name, year=year)
             month_folder = os.path.join(result_path, month_folder_name)
             os.makedirs(month_folder, exist_ok=True)
             # Move into months folders
@@ -96,7 +97,8 @@ def make_month_folders(result_path):
                 os.remove(file)
 
 
-# Gets date file that was created from cell last cell in original text file
+# Gets date from 'Original Filename' field
+#  that was created from last cell in original text file
 def get_date(text_file):
     with open(text_file, 'r') as original_file:
         row = original_file.readlines()[-1].split('\t')
@@ -121,30 +123,42 @@ def silent_remove(filename):
 
 
 def merge_txt_to_csv(path_to_directory):
-    """ Takes list of files from directory, makes file new each time and sets designated header values"""
+    """ Takes list of files from directory, makes data file new each time and
+    sets designated header values.
+    On first run this will make a new data file and begin to append relevant fields from all other
+    txt files in folder"""
     list_of_files = glob.glob(os.path.join(path_to_directory, '*.txt'))
     out_csv_file = os.path.join(path_to_directory, 'data.csv')
     silent_remove(out_csv_file)
     out_csv = csv.writer(open(out_csv_file, 'a', newline=''))
-    headers_in_file = list(csv.reader(open(list_of_files[0], 'rt'), delimiter='\t'))
-    # print(headers_in_file)
-    # original_filename = headers_in_file[0][headers_in_file[0].index('Original Filename')]
-    sample_name = headers_in_file[0][headers_in_file[0].index('Sample Name')]
-    component_name = headers_in_file[0][headers_in_file[0].index('Component Name')]
-    concentration = headers_in_file[0][headers_in_file[0].index('Calculated Concentration')]
+    # Open first file in list, take first row to obtain header values
+    headers_in_file = next(csv.reader(open(list_of_files[0], 'rt'), delimiter='\t'))
+    # Set all header values for fields
+    sample_name = headers_in_file[headers_in_file.index('Sample Name')]
+    component_name = headers_in_file[headers_in_file.index('Component Name')]
+    concentration = headers_in_file[headers_in_file.index('Calculated Concentration')]
     headers = [component_name, sample_name, concentration, 'Date']
     out_csv.writerow(headers)
-    # out_csv_opened = csv.writer(open(out_csv_file, 'a', newline=''))
-    for files in list_of_files:
-        in_file = list(csv.reader(open(files, 'rt'), delimiter='\t'))
 
+    for files in list_of_files:
+        """ in_file uses a list because we need the very last date to copy for each entry
+            otherwise using next() would be more memory efficient.  Tested using next()
+            and reseting the iterator back to 0 with file.seek(0) to get the row data.
+            Making list : 13.1s Max of 130 mb memory usage
+            Using next(): 18.5s Max of 65 mb memory usage
+            Would consider switching to next() in future if file size becomes an issue.
+            Rough maximal file size currently: 27 mb"""
+        in_file = list(csv.reader(open(files, 'rt'), delimiter='\t'))
         for rows in in_file:
+            # Looking for only low and high QC data points. Taking only first transitions
+            # which are indicated with a 1 at the end
             if rows[in_file[0].index('Sample Name')] in ('Low QC', 'HIgh QC') and \
                     rows[in_file[0].index('Component Name')].endswith('1'):
+                # Setting values in same manner that header was set
                 component_name = rows[in_file[0].index('Component Name')]
                 sample_name = rows[in_file[0].index('Sample Name')]
                 concentration = rows[in_file[0].index('Calculated Concentration')]
-                date_name = (os.path.basename(in_file[-1][in_file[0].index('Original Filename')])[:8])
+                date_name = (os.path.basename(in_file[1][in_file[0].index('Original Filename')])[:8])
                 date_formatted = str(pd.to_datetime(date_name, format='%Y%m%d').date())
                 date_final = datetime.datetime.strptime(date_formatted, '%Y-%m-%d').strftime('%m-%d-%y')
                 values = [component_name, sample_name, concentration, date_final]
