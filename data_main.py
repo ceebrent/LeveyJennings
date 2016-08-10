@@ -13,8 +13,7 @@ import pandas as pd
 class LeveyJennings(object):
     def __init__(self, lab_name):
 
-        # self.homeDirectory = get_home()
-        self.homeDirectory = r'D:/Coding/Python/TestFiles'
+        self.homeDirectory = get_home()
         self.lab_name = lab_name
 
     # Creates and returns folder to store results into
