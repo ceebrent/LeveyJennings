@@ -1,6 +1,7 @@
 # LeveyJennings
 ### Scope and Purpose
 Creates LeveyJennings charts dynamically for multiple laboratories from raw HPLC-MS/MS txt data.
+(PENDING REFACTOR)
 
 ### Packages
 PyQt4, NumPy, Matplotlib, Pandas
