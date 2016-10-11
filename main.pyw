@@ -14,7 +14,7 @@ from graph_package import make_graph
 from graph_package import validate_data_csv
 import loading_dialog
 import warning_popup
-from labs_dict import labs
+from labs_dict import get_labs
 
 
 try:
@@ -56,7 +56,7 @@ class Ui_graph_tab(object):
         # Add lab names to combo box
         self.lab_combo_box = QtGui.QComboBox(self.verticalLayoutWidget_2)
         self.lab_combo_box.setObjectName(_fromUtf8("lab_combo_box"))
-        self.labs_list = list(sorted(labs.keys()))
+        self.labs_list = list(sorted(get_labs().keys()))
         for x in range(len(self.labs_list)):
             self.lab_combo_box.addItem(self.labs_list[x])
 
@@ -123,7 +123,7 @@ class Ui_graph_tab(object):
 
     def submit_labs(self, generate_data_tab):
         lab_selected = self.lab_combo_box.currentText()
-        lab_value = labs.get(lab_selected, None)
+        lab_value = get_labs()[lab_selected]
         self.create_data(lab_value)
 
     def create_data(self, lab_value):
