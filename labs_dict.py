@@ -1,14 +1,13 @@
-labs = {
-    'B3 Diagnostics': 'B3',
-    'Emerald Coast': 'EMC',
-    'Foremost Laboratories': 'FMT',
-    'Complete Toxicology': 'CTL',
-    'Theramedical Laboratories': 'TML',
-    'Ark Laboratories': 'ARK',
-    'Crescen Tox': 'CRE',
-    'Advance Laboratories': 'ADV',
-    'Atlantis Diagnostic Laboratories': 'ADL',
-    'Lab Tox': 'LTC',
-    'USA Laboratories': 'USA',
-    'Michigan Neurological Association': 'MNA'
-}
+from data_main import get_home
+import os
+import json
+
+
+def get_labs():
+    current_dir = get_home()
+    json_file = os.path.join(current_dir,'lab_names.json')
+
+    with open(json_file) as data_file:
+        json_data = json.load(data_file)
+        labs = json_data["labs"]
+        return labs
