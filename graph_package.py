@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
-
+from data_main import silent_remove
 plt.style.use('ggplot')
 
 
@@ -102,11 +102,12 @@ def make_graph(lab_name, data_csv):
             drug_group[y < (y_mean - y_sd * 2)].to_csv(f, header=False)
             drug_group[y > (y_mean + y_sd * 2)].to_csv(f, header=False)
 
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(15, 6))
         plt.xlim(np.amin(x_values)-.5, np.amax(x_values)+.5)
         plt.ylim(y_mean - y_sd * 4, y_mean + y_sd * 4)
-        plt.xticks(x_values, x, rotation=60)
-        plt.tick_params(axis='x', labelsize=5)
+        plt.xticks(x_values, x, rotation=45, fontweight='bold')
+        plt.tick_params(axis='x', labelsize=10)
+        plt.subplots_adjust(bottom=0.2)
         plt.title('{lab_name} {month_name} {QC} {drug_name}'.format(lab_name=lab_name, month_name=month_folder_name,
                                                          QC=QC, drug_name=drug_name[:-2]))
         plt.ylabel('Concentration (ng/mL)', fontsize=10)
@@ -135,8 +136,17 @@ def make_graph(lab_name, data_csv):
         pdf_to_save.savefig()
         plt.close()
     pdf_to_save.close()
+    sort_style_sd(outside_sd)
+
+def sort_style_sd(sd_csv):
+    if os.stat(sd_csv).st_size == 0:
+        pass
+    else:
+        df = pd.read_csv(sd_csv, header=0, names = ['Index','Component Name', 'Sample Name', 'Calculated Concentration', 'Date'])
+        df.drop('Index',axis=1, inplace=True)
+        df.sort_values(['Date','Sample Name'], ascending=[True, False], inplace=True)
+        df.to_csv(sd_csv, index=False)
 
 def validate_data_csv(data_csv):
     if data_csv.endswith('data.csv'):
         return True
-

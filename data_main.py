@@ -121,6 +121,7 @@ def silent_remove(filename):
             raise  # re-raise exception if a different error occurred
 
 
+
 def merge_txt_to_csv(path_to_directory):
     """ Takes list of files from directory, makes data file new each time and
     sets designated header values.
@@ -157,7 +158,7 @@ def merge_txt_to_csv(path_to_directory):
                 component_name = rows[in_file[0].index('Component Name')]
                 sample_name = rows[in_file[0].index('Sample Name')]
                 concentration = rows[in_file[0].index('Calculated Concentration')]
-                date_name = (os.path.basename(in_file[1][in_file[0].index('Original Filename')])[:8])
+                date_name = (os.path.basename(in_file[-1][in_file[0].index('Original Filename')])[:8])
                 date_formatted = str(pd.to_datetime(date_name, format='%Y%m%d').date())
                 date_final = datetime.datetime.strptime(date_formatted, '%Y-%m-%d').strftime('%m-%d-%y')
                 values = [component_name, sample_name, concentration, date_final]
@@ -185,5 +186,3 @@ def generate_data(lab_value):
     lab.make_unique_files()
     make_month_folders(lab.lab_results)
     walk_months(lab.lab_results)
-
-

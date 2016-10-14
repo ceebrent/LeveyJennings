@@ -15,7 +15,8 @@ from graph_package import validate_data_csv
 import loading_dialog
 import warning_popup
 from labs_dict import get_labs
-
+import tkinter
+from tkinter import filedialog
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
